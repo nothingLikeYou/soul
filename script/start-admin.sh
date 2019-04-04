@@ -15,10 +15,10 @@ if $noJavaHome ; then
 fi
 
 
-APP='/data/apps/soul/soul-admin.jar'
+APP='/home/wwwroot/LDO-training-platform-gateway/apps/soul-admin.jar'
 ENV=$1
-BASE_DIR=/data/apps
-APP_DIR=$BASE_DIR/soul
+BASE_DIR=/home/wwwroot/LDO-training-platform-gateway
+APP_DIR=$BASE_DIR/apps
 LOG_DIR=$BASE_DIR/logs
 PID_FILE=$LOG_DIR/soul-admin.pid
 

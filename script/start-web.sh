@@ -15,10 +15,10 @@ if $noJavaHome ; then
     exit 1
 fi
 
-APP='/data/apps/soul/soul-bootstrap.jar'
+APP='/home/wwwroot/LDO-training-platform-gateway/apps/soul-bootstrap.jar'
 ENV=$1
-BASE_DIR=/data/apps
-APP_DIR=$BASE_DIR/soul
+BASE_DIR=/home/wwwroot/LDO-training-platform-gateway
+APP_DIR=$BASE_DIR/apps
 LOG_DIR=$BASE_DIR/logs
 PID_FILE=$APP_DIR/soul-bootstrap.pid
 
@@ -51,7 +51,7 @@ JAVA_OPTS="$JAVA_OPTS -Xloggc:$LOG_DIR/gc.log"
 RETVAL=0
 start()
 {
-    mkdir -p $LOG_DIR $USER_LOG_DIR
+    mkdir -p $LOG_DIR
     run_cmd="java $JAVA_OPTS -jar $APP --spring.profiles.active=$ENV"
     $run_cmd >> $LOG_DIR/stdout.log 2>&1 &
     echo $! > "$PID_FILE"
