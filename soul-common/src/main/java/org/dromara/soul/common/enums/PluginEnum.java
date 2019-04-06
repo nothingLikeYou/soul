@@ -63,24 +63,29 @@ public enum PluginEnum {
     REDIRECT(40, 0, "redirect"),
 
     /**
+     * AUTH plugin enum.
+     */
+    AUTH(50, 1, "auth"),
+
+    /**
      * Divide plugin enum.
      */
-    DIVIDE(50, 0, "divide"),
+    DIVIDE(60, 0, "divide"),
 
     /**
      * Dubbo plugin enum.
      */
-    DUBBO(60, 0, "dubbo"),
+    DUBBO(70, 0, "dubbo"),
 
     /**
      * springCloud plugin enum.
      */
-    SPRING_CLOUD(70, 0, "springCloud"),
+    SPRING_CLOUD(80, 0, "springCloud"),
 
     /**
      * Monitor plugin enum.
      */
-    MONITOR(80, 0, "monitor");
+    MONITOR(90, 0, "monitor");
 
     private final int code;
 

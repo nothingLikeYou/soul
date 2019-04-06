@@ -25,7 +25,6 @@ import org.dromara.soul.common.dto.convert.DivideUpstream;
 import org.dromara.soul.common.dto.convert.rule.DivideRuleHandle;
 import org.dromara.soul.common.dto.zk.RuleZkDTO;
 import org.dromara.soul.common.dto.zk.SelectorZkDTO;
-import org.dromara.soul.common.dto.zk.UserZkDTO;
 import org.dromara.soul.common.enums.PluginEnum;
 import org.dromara.soul.common.enums.PluginTypeEnum;
 import org.dromara.soul.common.enums.ResultEnum;
@@ -77,11 +76,7 @@ public class DividePlugin extends AbstractSoulPlugin {
 
     @Override
     protected Mono<Void> doExecute(final ServerWebExchange exchange, final SoulPluginChain chain, final SelectorZkDTO selector, final RuleZkDTO rule) {
-        // TODO: 19-4-6 删除测试代码
-        UserZkDTO userZkDTO = zookeeperCacheManager.findUserZkDTOByUserId("ce9dafb14c6e11e9be7e000c29af0399");
         final RequestDTO requestDTO = exchange.getAttribute(Constants.REQUESTDTO);
-        List<String> roles = zookeeperCacheManager.findRolePermRuleListByUrl(requestDTO.getMethod());
-
         final DivideRuleHandle ruleHandle = GsonUtils.getInstance().fromJson(rule.getHandle(), DivideRuleHandle.class);
 
         if (StringUtils.isBlank(ruleHandle.getGroupKey())) {

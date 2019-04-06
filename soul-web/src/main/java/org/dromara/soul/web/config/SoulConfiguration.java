@@ -29,6 +29,7 @@ import org.dromara.soul.web.handler.SoulWebHandler;
 import org.dromara.soul.web.plugin.SoulPlugin;
 import org.dromara.soul.web.plugin.after.MonitorPlugin;
 import org.dromara.soul.web.plugin.after.ResponsePlugin;
+import org.dromara.soul.web.plugin.before.AuthPlugin;
 import org.dromara.soul.web.plugin.before.GlobalPlugin;
 import org.dromara.soul.web.plugin.before.SignPlugin;
 import org.dromara.soul.web.plugin.before.WafPlugin;
@@ -145,6 +146,16 @@ public class SoulConfiguration {
     @Bean
     public SoulPlugin rewritePlugin() {
         return new RewritePlugin(zookeeperCacheManager);
+    }
+
+    /**
+     * init authPlugin.
+     *
+     * @return {@linkplain AuthPlugin}
+     */
+    @Bean
+    public SoulPlugin authPlugin() {
+        return new AuthPlugin(zookeeperCacheManager);
     }
 
     /**

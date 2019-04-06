@@ -171,6 +171,11 @@ public interface Constants {
     String SIGN_IS_NOT_PASS = "sign is not pass,Please check you sign algorithm!";
 
     /**
+     * The constant AUTH_IS_NOT_PASS.
+     */
+    String AUTH_IS_NOT_PASS = "no permission!";
+
+    /**
      * The constant LINE_SEPARATOR.
      */
     String LINE_SEPARATOR = System.getProperty("line.separator");
