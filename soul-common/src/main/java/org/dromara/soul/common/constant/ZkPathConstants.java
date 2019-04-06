@@ -45,6 +45,46 @@ public final class ZkPathConstants implements Constants {
     public static final String APP_AUTH_PARENT = "/soul/auth";
 
     /**
+     * the constant LDO_TRAINING_USER_PARENT.
+     */
+    public static final String LDO_TRAINING_USER_PARENT = "/ldo/training/user";
+
+    /**
+     * the constant LDO_TRAINING_ROLE_PERM_RULE_PARENT.
+     */
+    public static final String LDO_TRAINING_ROLE_PERM_RULE_PARENT = "/ldo/training/role/perm/rule";
+
+    /**
+     * buildLdoTrainingUserPath.
+     *
+     * @param userCompanyId userCompanyId
+     * @return zk path for ldo_training_user
+     */
+    public static String buildLdoTrainingUserPath(final String userCompanyId) {
+        return String.join("/", LDO_TRAINING_USER_PARENT, userCompanyId);
+    }
+
+    /**
+     * buildLdoTrainingUserParent
+     *
+     * @return
+     */
+    public static String buildLdoTrainingUserParent() {
+        return String.join("/", LDO_TRAINING_USER_PARENT);
+    }
+
+
+    /**
+     * buildLdoTrainingRolePermRulePath
+     *
+     * @param url url
+     * @return zk path for ldo_training_role_perm_rule
+     */
+    public static String buildLdoTrainingRolePermRulePath(final String url) {
+        return String.join("/", LDO_TRAINING_ROLE_PERM_RULE_PARENT, url);
+    }
+
+    /**
      * acquire app_auth_path.
      *
      * @param appKey appKey

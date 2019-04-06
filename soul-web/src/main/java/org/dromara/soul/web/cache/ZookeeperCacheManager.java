@@ -24,11 +24,9 @@ import com.google.common.collect.Maps;
 import org.I0Itec.zkclient.IZkDataListener;
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.dromara.soul.common.constant.ZkPathConstants;
-import org.dromara.soul.common.dto.zk.AppAuthZkDTO;
-import org.dromara.soul.common.dto.zk.PluginZkDTO;
-import org.dromara.soul.common.dto.zk.RuleZkDTO;
-import org.dromara.soul.common.dto.zk.SelectorZkDTO;
+import org.dromara.soul.common.dto.zk.*;
 import org.dromara.soul.common.enums.PluginEnum;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -57,6 +52,10 @@ public class ZookeeperCacheManager implements CommandLineRunner, DisposableBean 
     private static final Map<String, List<RuleZkDTO>> RULE_MAP = Maps.newConcurrentMap();
 
     private static final Map<String, AppAuthZkDTO> AUTH_MAP = Maps.newConcurrentMap();
+
+    private static final Map<String, UserZkDTO> USER_MAP = Maps.newConcurrentMap();
+
+    private static final Map<String, RolePermRuleZkDTO> ROLE_PERM_RULE_MAP = Maps.newConcurrentMap();
 
     private final ZkClient zkClient;
 
@@ -113,10 +112,88 @@ public class ZookeeperCacheManager implements CommandLineRunner, DisposableBean 
         return RULE_MAP.get(selectorId);
     }
 
+    /**
+     * acquire UserZkDTO by userId with  USER_MAP HashMap container.
+     *
+     * @param userId this is userId
+     * @return UserZkDTO
+     */
+    public UserZkDTO findUserZkDTOByUserId(final String userId) {
+        return USER_MAP.get(userId);
+    }
+
+    /**
+     * acquire role list by url with  ROLE_PERM_RULE_MAP HashMap container.
+     *
+     * @param url this is url
+     * @return role list
+     */
+    public List<String> findRolePermRuleListByUrl(final String url) {
+        RolePermRuleZkDTO rolePermRuleZkDTO = ROLE_PERM_RULE_MAP.get(url.replace("/", "$"));
+        if (rolePermRuleZkDTO == null) {
+            return Lists.newArrayList();
+        }
+        if (StringUtils.isBlank(rolePermRuleZkDTO.getNeedRoles())) {
+            return Lists.newArrayList();
+        }
+        return Arrays.asList(StringUtils.split(rolePermRuleZkDTO.getNeedRoles(), ","));
+    }
+
     @Override
     public void run(final String... args) {
         watcherData();
+        watcherUserZkDTOData();
         watchAppAuth();
+    }
+
+    /**
+     * 监听ldo项目相关数据
+     */
+    private void watcherUserZkDTOData() {
+        final String ldoTrainingUserParent = ZkPathConstants.LDO_TRAINING_USER_PARENT;
+        if (!zkClient.exists(ldoTrainingUserParent)) {
+            zkClient.createPersistent(ldoTrainingUserParent, true);
+        }
+        List<String> userCompanyIds = zkClient.getChildren(ZkPathConstants.buildLdoTrainingUserParent());
+        for (String userCompanyId : userCompanyIds) {
+            loadLdoTrainingUser(userCompanyId);
+        }
+        zkClient.subscribeChildChanges(ldoTrainingUserParent, (parentPath, currentChildren) -> {
+            if (CollectionUtils.isNotEmpty(currentChildren)) {
+                for (String userCompanyId : currentChildren) {
+                    loadLdoTrainingUser(userCompanyId);
+                }
+            }
+        });
+    }
+
+    /**
+     * 加载节点数据
+     *
+     * @param userCompanyId
+     */
+    private void loadLdoTrainingUser(String userCompanyId) {
+        String ldoTrainingUserPath = ZkPathConstants.buildLdoTrainingUserPath(userCompanyId);
+        if (!zkClient.exists(ldoTrainingUserPath)) {
+            zkClient.createPersistent(ldoTrainingUserPath, true);
+        }
+        UserZkDTO userZkDTO = zkClient.readData(ldoTrainingUserPath);
+        Optional.ofNullable(userZkDTO).ifPresent(d -> USER_MAP.put(userCompanyId, userZkDTO));
+        zkClient.subscribeDataChanges(ldoTrainingUserPath, new IZkDataListener() {
+            @Override
+            public void handleDataChange(final String dataPath, final Object data) throws Exception {
+                Optional.ofNullable(data)
+                        .ifPresent(o -> {
+                            UserZkDTO dto = (UserZkDTO) o;
+                            USER_MAP.put(dto.getUserCompanyId(), dto);
+                        });
+            }
+
+            @Override
+            public void handleDataDeleted(final String dataPath) throws Exception {
+                USER_MAP.remove(userCompanyId);
+            }
+        });
     }
 
     private void watcherData() {

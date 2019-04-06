@@ -55,7 +55,7 @@ public abstract class AbstractSoulPlugin implements SoulPlugin {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSoulPlugin.class);
 
-    private final ZookeeperCacheManager zookeeperCacheManager;
+    public final ZookeeperCacheManager zookeeperCacheManager;
 
     /**
      * this is Template Method child has Implement your own logic.
