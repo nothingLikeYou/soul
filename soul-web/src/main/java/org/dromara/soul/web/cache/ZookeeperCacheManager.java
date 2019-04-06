@@ -129,7 +129,7 @@ public class ZookeeperCacheManager implements CommandLineRunner, DisposableBean 
      * @return role list
      */
     public List<String> findRolePermRuleListByUrl(final String url) {
-        RolePermRuleZkDTO rolePermRuleZkDTO = ROLE_PERM_RULE_MAP.get(url.replace("/", "$"));
+        RolePermRuleZkDTO rolePermRuleZkDTO = ROLE_PERM_RULE_MAP.get(url);
         if (rolePermRuleZkDTO == null) {
             return Lists.newArrayList();
         }
@@ -142,8 +142,9 @@ public class ZookeeperCacheManager implements CommandLineRunner, DisposableBean 
     @Override
     public void run(final String... args) {
         watcherData();
-        watcherUserZkDTOData();
         watchAppAuth();
+        watcherUserZkDTOData();
+        watcherRolePerRuleData();
     }
 
     /**
@@ -168,7 +169,57 @@ public class ZookeeperCacheManager implements CommandLineRunner, DisposableBean 
     }
 
     /**
-     * 加载节点数据
+     * 监听权限过滤规则数据
+     */
+    private void watcherRolePerRuleData() {
+        final String ldoTrainingRolePermRuleParent = ZkPathConstants.LDO_TRAINING_ROLE_PERM_RULE_PARENT;
+        if (!zkClient.exists(ldoTrainingRolePermRuleParent)) {
+            zkClient.createPersistent(ldoTrainingRolePermRuleParent, true);
+        }
+        List<String> urls = zkClient.getChildren(ZkPathConstants.buildLdoTrainingRolePermRuleParent());
+        for (String url : urls) {
+            loadLdoTrainingRolePermRule(url);
+        }
+        zkClient.subscribeChildChanges(ldoTrainingRolePermRuleParent, (parentPath, currentChildren) -> {
+            if (CollectionUtils.isNotEmpty(currentChildren)) {
+                for (String url : currentChildren) {
+                    loadLdoTrainingRolePermRule(url);
+                }
+            }
+        });
+    }
+
+    /**
+     * 加载权限过滤规则节点数据
+     *
+     * @param url
+     */
+    private void loadLdoTrainingRolePermRule(String url) {
+        String ldoTrainingRolePermRulePath = ZkPathConstants.buildLdoTrainingRolePermRulePath(url);
+        if (!zkClient.exists(ldoTrainingRolePermRulePath)) {
+            zkClient.createPersistent(ldoTrainingRolePermRulePath, true);
+        }
+        RolePermRuleZkDTO rolePermRuleZkDTO = zkClient.readData(ldoTrainingRolePermRulePath);
+        Optional.ofNullable(rolePermRuleZkDTO).ifPresent(d -> ROLE_PERM_RULE_MAP.put(url, rolePermRuleZkDTO));
+        zkClient.subscribeDataChanges(ldoTrainingRolePermRulePath, new IZkDataListener() {
+            @Override
+            public void handleDataChange(final String dataPath, final Object data) throws Exception {
+                Optional.ofNullable(data)
+                        .ifPresent(o -> {
+                            RolePermRuleZkDTO dto = (RolePermRuleZkDTO) o;
+                            ROLE_PERM_RULE_MAP.put(dto.getUrl().replace("$", "/"), dto);
+                        });
+            }
+
+            @Override
+            public void handleDataDeleted(final String dataPath) throws Exception {
+                ROLE_PERM_RULE_MAP.remove(url);
+            }
+        });
+    }
+
+    /**
+     * 加载用户信息节点数据
      *
      * @param userCompanyId
      */

@@ -75,6 +75,15 @@ public final class ZkPathConstants implements Constants {
 
 
     /**
+     * buildLdoTrainingRolePermRuleParent
+     *
+     * @return zk parent for ldo_training_role_perm_rule
+     */
+    public static String buildLdoTrainingRolePermRuleParent() {
+        return String.join("/", LDO_TRAINING_ROLE_PERM_RULE_PARENT);
+    }
+
+    /**
      * buildLdoTrainingRolePermRulePath
      *
      * @param url url

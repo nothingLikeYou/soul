@@ -80,6 +80,7 @@ public class DividePlugin extends AbstractSoulPlugin {
         // TODO: 19-4-6 删除测试代码
         UserZkDTO userZkDTO = zookeeperCacheManager.findUserZkDTOByUserId("ce9dafb14c6e11e9be7e000c29af0399");
         final RequestDTO requestDTO = exchange.getAttribute(Constants.REQUESTDTO);
+        List<String> roles = zookeeperCacheManager.findRolePermRuleListByUrl(requestDTO.getMethod());
 
         final DivideRuleHandle ruleHandle = GsonUtils.getInstance().fromJson(rule.getHandle(), DivideRuleHandle.class);
 
