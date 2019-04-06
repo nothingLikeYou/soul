@@ -88,6 +88,16 @@ public class RequestDTO implements Serializable {
     private String extInfo;
 
     /**
+     * authorization jwt token
+     */
+    private String authorization;
+
+    /**
+     * userId
+     */
+    private String userId;
+
+    /**
      * ServerHttpRequest transform RequestDTO .
      *
      * @param request {@linkplain ServerHttpRequest}
@@ -101,10 +111,11 @@ public class RequestDTO implements Serializable {
         final String rpcType = request.getHeaders().getFirst(Constants.RPC_TYPE);
         final String sign = request.getHeaders().getFirst(Constants.SIGN);
         final String timestamp = request.getHeaders().getFirst(Constants.TIMESTAMP);
+        final String authorization = request.getHeaders().getFirst(Constants.AUTHORIZATION);
         String dubboParamsDecoder = null;
         try {
-            dubboParamsDecoder = URLDecoder.decode(request.getHeaders().getFirst(Constants.DUBBO_PARAMS),"UTF-8");
-        }catch (Exception e ){
+            dubboParamsDecoder = URLDecoder.decode(request.getHeaders().getFirst(Constants.DUBBO_PARAMS), "UTF-8");
+        } catch (Exception e) {
 
         }
         final String dubboParams = dubboParamsDecoder;
@@ -119,6 +130,7 @@ public class RequestDTO implements Serializable {
         requestDTO.setTimestamp(timestamp);
         requestDTO.setDubboParams(dubboParams);
         requestDTO.setExtInfo(extInfo);
+        requestDTO.setAuthorization(authorization);
         return requestDTO;
     }
 

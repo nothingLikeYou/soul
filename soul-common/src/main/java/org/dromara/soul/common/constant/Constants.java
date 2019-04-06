@@ -101,6 +101,16 @@ public interface Constants {
     String TIMESTAMP = "timestamp";
 
     /**
+     * The constant AUTHORIZATION.
+     */
+    String AUTHORIZATION = "authorization";
+
+    /**
+     * The constant USERID.
+     */
+    String USERID = "userId";
+
+    /**
      * The constant RETRY.
      */
     int RETRY = 3;
