@@ -21,6 +21,7 @@ package org.dromara.soul.web.config;
 import org.dromara.soul.web.cache.UpstreamCacheManager;
 import org.dromara.soul.web.cache.ZookeeperCacheManager;
 import org.dromara.soul.web.disruptor.publisher.SoulEventPublisher;
+import org.dromara.soul.web.filter.AuthFilter;
 import org.dromara.soul.web.filter.ParamWebFilter;
 import org.dromara.soul.web.filter.TimeWebFilter;
 import org.dromara.soul.web.handler.SoulHandlerMapping;
@@ -208,12 +209,23 @@ public class SoulConfiguration {
     }
 
     /**
+     * init param auth filter.
+     *
+     * @return {@linkplain AuthFilter}
+     */
+    @Bean
+    @Order(2)
+    public AuthFilter authFilter() {
+        return new AuthFilter();
+    }
+
+    /**
      * init time web filter.
      *
      * @return {@linkplain TimeWebFilter}
      */
     @Bean
-    @Order(2)
+    @Order(3)
     @ConditionalOnProperty(name = "soul.timeVerify.enabled", matchIfMissing = true)
     public WebFilter timeWebFilter() {
         return new TimeWebFilter();
