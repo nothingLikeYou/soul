@@ -8,6 +8,7 @@ import org.dromara.soul.common.enums.PluginTypeEnum;
 import org.dromara.soul.common.exception.CommonErrorCode;
 import org.dromara.soul.common.result.SoulResult;
 import org.dromara.soul.common.utils.JsonUtils;
+import org.dromara.soul.common.utils.UserAgentUtils;
 import org.dromara.soul.web.cache.ZookeeperCacheManager;
 import org.dromara.soul.web.plugin.SoulPlugin;
 import org.dromara.soul.web.plugin.SoulPluginChain;
@@ -80,7 +81,7 @@ public class AuthPlugin implements SoulPlugin {
     @Override
     public Mono<Void> execute(ServerWebExchange exchange, SoulPluginChain chain) {
         final RequestDTO requestDTO = exchange.getAttribute(Constants.REQUESTDTO);
-        final SoulResult soulResult = authVerify(Objects.requireNonNull(requestDTO));
+        final SoulResult soulResult = authVerify(Objects.requireNonNull(requestDTO), exchange);
         if (!soulResult.getCode().equals(CommonErrorCode.SUCCESSFUL)) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
@@ -95,8 +96,8 @@ public class AuthPlugin implements SoulPlugin {
      * @param requestDTO {@linkplain RequestDTO}
      * @return result : True is pass, False is not pass.
      */
-    private SoulResult authVerify(RequestDTO requestDTO) {
-        if (StringUtils.isBlank(requestDTO.getUserId())) {
+    private SoulResult authVerify(RequestDTO requestDTO, ServerWebExchange exchange) {
+        if (StringUtils.isBlank(requestDTO.getAuthorization()) && StringUtils.isBlank(requestDTO.getUserId())) {
             return SoulResult.success();
         }
         UserZkDTO userZkDTO = mZookeeperCacheManager.findUserZkDTOByUserId(requestDTO.getUserId());
@@ -109,10 +110,10 @@ public class AuthPlugin implements SoulPlugin {
         if (!StringUtils.equals(userZkDTO.getUserStatus(), USER_STATUS_TRUE)) {
             return SoulResult.error(10299, "用户非在职状态,请联系管理员恢复!");
         }
-        if (StringUtils.equals(userZkDTO.getPcLogin(), NO)) {
+        if (UserAgentUtils.isComputer(exchange) && StringUtils.equals(userZkDTO.getPcLogin(), NO)) {
             return SoulResult.error(10324, "账户已被限制登录pc端,请联系管理员");
         }
-        if (StringUtils.equals(userZkDTO.getMobileLogin(), NO)) {
+        if (UserAgentUtils.isMobile(exchange) && StringUtils.equals(userZkDTO.getMobileLogin(), NO)) {
             return SoulResult.error(10325, "账户已被限制登录手机端,请联系管理员");
         }
         List<String> roles = mZookeeperCacheManager.findRolePermRuleListByUrl(requestDTO.getMethod());

@@ -49,6 +49,13 @@
             <version>0.9.0</version>
         </dependency>
 
+        <!--UserAgentUtils-1.13.jar-->
+        <dependency>
+            <groupId>com.userAgentUtils</groupId>
+            <artifactId>userAgentUtils</artifactId>
+            <version>1.13</version>
+        </dependency>
+
     </dependencies>
 
 
