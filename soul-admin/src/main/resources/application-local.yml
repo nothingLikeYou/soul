@@ -16,7 +16,7 @@ spring:
      dbcp2:
        driver-class-name: com.mysql.jdbc.Driver
    zookeeper:
-     url: localhost:2181
+     url: 192.168.2.221:2181
      sessionTimeout: 5000
      connectionTimeout: 2000
      serializer: KryoSerializer
