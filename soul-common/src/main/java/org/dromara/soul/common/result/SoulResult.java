@@ -18,6 +18,7 @@
 
 package org.dromara.soul.common.result;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import org.dromara.soul.common.exception.CommonErrorCode;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,7 @@ import java.io.Serializable;
  * @author xiaoyu
  */
 @Data
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class SoulResult implements Serializable {
 
     private static final long serialVersionUID = -2792556188993845048L;
