@@ -110,6 +110,7 @@ public class HttpCommand extends HystrixObservableCommand<Void> {
             return WEB_CLIENT.get().uri(uri)
                     .headers(httpHeaders -> {
                         httpHeaders.addAll(exchange.getRequest().getHeaders());
+                        httpHeaders.add(Constants.USERID, requestDTO.getUserId());
                         httpHeaders.remove(HttpHeaders.HOST);
                     })
                     .exchange()
@@ -120,6 +121,7 @@ public class HttpCommand extends HystrixObservableCommand<Void> {
             return WEB_CLIENT.post().uri(buildRealURL())
                     .headers(httpHeaders -> {
                         httpHeaders.addAll(exchange.getRequest().getHeaders());
+                        httpHeaders.add(Constants.USERID, requestDTO.getUserId());
                         httpHeaders.remove(HttpHeaders.HOST);
                     })
                     .contentType(buildMediaType())
